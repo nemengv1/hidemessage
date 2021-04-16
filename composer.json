@@ -1,0 +1,19 @@
+{
+    "name": "lzy/hidemessage",
+    "description": "在图片里隐藏一些文本",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "liangzeya",
+            "email": "nemengv1@163.com"
+        }
+    ],
+    "require": {
+    
+    },
+    "autoload": {
+        "psr-4": {
+          "hidemessage\\": "src"
+        }
+    }
+}
