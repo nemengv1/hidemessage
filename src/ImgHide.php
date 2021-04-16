@@ -143,7 +143,6 @@ class ImgHide
             foreach($content as &$val) {
                 $val = self::binToStr($val);
             }
-            echo implode('', $content);
             return implode('', $content);
         }catch (\Exception $e) {
             throw new \Exception($e->getMessage());
