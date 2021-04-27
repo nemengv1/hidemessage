@@ -20,8 +20,9 @@ class ImgHide
     public static function writeMessage($img_path, $new_img_path, $content, $ole_delete=false)
     {
         try{
+            $sign = '000001001100111110111110100101';
             // 把内容长度和内容统统转换为二进制
-            $content_bin    = str_pad(base_convert(mb_strlen($content, 'utf-8') * 24, 10, 2), 30, '0', STR_PAD_LEFT) . self::StrToBin($content);
+            $content_bin    = $sign . str_pad(base_convert(mb_strlen($content, 'utf-8') * 24, 10, 2), 30, '0', STR_PAD_LEFT) . self::StrToBin($content);
             // 二进制字符串长度
             $strlen         = strlen($content_bin);
             // 所需保存数据的像素个数
@@ -29,7 +30,7 @@ class ImgHide
             // 图片尺寸
             $imagesize      = getimagesize($img_path);
             // 判断内容大小
-            if( ( $imagesize[0] * $imagesize[1] ) < ( $ratlen + 10 ) ) {
+            if( ( $imagesize[0] * $imagesize[1] ) < ( $ratlen + 20 ) ) {
                 throw new \Exception('内容太大，超出隐写范围');
             }
             // 只允许png格式的文件
@@ -72,6 +73,7 @@ class ImgHide
             if($ole_delete) {
                 @unlink($img_path);
             }
+            return true;
         }catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -102,7 +104,7 @@ class ImgHide
 
             for($x = 0; $x < ($imagesize[0] - 1); $x++) {
                 for($y = 0; $y < ($imagesize[1] - 1); $y++) {
-                    if($ratlen_index < 10) {
+                    if($ratlen_index < 20) {
                         // 读取写入的内容的长度
                         $rat    = imagecolorat($image, $x, $y);
                         $rat    = imagecolorsforindex($image, $rat);
@@ -117,10 +119,17 @@ class ImgHide
                         $content_len .= $b;
                         $ratlen_index++;
                         if($ratlen_index == 10) {
+                            if($content_len != '000001001100111110111110100101') {
+                                throw new \Exception('该图片没有隐写内容');
+                            } else {
+                                $content_len = '';
+                            }
+                        }
+                        if($ratlen_index == 20) {
                             // 设置文本内容的长度
                             $content_len = base_convert($content_len,2,10)/3;
                         }
-                    } elseif ($ratlen_index < ($content_len + 10)) {
+                    } elseif ($ratlen_index < ($content_len + 20)) {
                         // 读取文本内容
                         $rat    = imagecolorat($image, $x, $y);
                         $rat    = imagecolorsforindex($image, $rat);
